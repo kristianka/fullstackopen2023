@@ -2,9 +2,9 @@ import { useState } from 'react'
 
 const StatisticLine = ({ text, value, percentage }) => {
   return (
-    <>
-      <p>{text} {value} {percentage === true ? "%" : ""}</p>
-    </>
+    <tr>
+      <td>{text}</td> <td>{value} {percentage === true ? "%" : ""} </td>
+    </tr>
   )
 }
 
@@ -21,7 +21,6 @@ const Statistics = ({ good, neutral, bad }) => {
   const weightedScore = (good + bad * -1) / total;
   const amountOfPositive = good / total * 100;
 
-  <h2>Statistics</h2>
   if (total === 0) {
     return (
       <div>
@@ -31,12 +30,16 @@ const Statistics = ({ good, neutral, bad }) => {
   }
   return (
     <div>
-      <StatisticLine text="Good" value={good} percentage={false} />
-      <StatisticLine text="Neutral" value={neutral} percentage={false} />
-      <StatisticLine text="Bad" value={bad} percentage={false} />
-      <StatisticLine text="In total" value={total} percentage={false} />
-      <StatisticLine text="Average" value={weightedScore} percentage={false} />
-      <StatisticLine text="Positive" value={amountOfPositive} percentage={true} />
+      <table>
+        <tbody>
+          <StatisticLine text="Good" value={good} percentage={false} />
+          <StatisticLine text="Neutral" value={neutral} percentage={false} />
+          <StatisticLine text="Bad" value={bad} percentage={false} />
+          <StatisticLine text="In total" value={total} percentage={false} />
+          <StatisticLine text="Average" value={weightedScore} percentage={false} />
+          <StatisticLine text="Positive" value={amountOfPositive} percentage={true} />
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -64,6 +67,7 @@ const App = () => {
         <Button handleClick={increaseNeutralByOne} text="Neutral" />
         <Button handleClick={increaseBadByOne} text="Bad" />
       </div>
+      <h2>Statistics</h2>
       <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
