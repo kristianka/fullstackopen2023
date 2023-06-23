@@ -1,0 +1,1 @@
+Exercises for this part can be found here: https://github.com/kristianka/fullstack_phonebook_backend

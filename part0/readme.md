@@ -1,0 +1,1 @@
+Exercises for this part can be found here: https://github.com/kristianka/fullstackopen/tree/main/osa1
