@@ -3,7 +3,7 @@ import { useState } from 'react'
 const StatisticLine = ({ text, value, percentage }) => {
   return (
     <tr>
-      <td>{text}</td> <td>{value} {percentage === true ? "%" : ""} </td>
+      <td>{text}</td><td>{value}{percentage === true ? "%" : ""}</td>
     </tr>
   )
 }
