@@ -1,6 +1,6 @@
 import personsService from "../services/persons";
 
-const Person = ({ id, name, number, setPersons, errorMsg, setErrorMsg }) => {
+const Person = ({ id, name, number, setPersons, setNotification, setNotificationType }) => {
 
     const deletePerson = async () => {
         console.log("in remove person");
@@ -14,11 +14,14 @@ const Person = ({ id, name, number, setPersons, errorMsg, setErrorMsg }) => {
             const updateTable = await personsService.getAll();
             setPersons(updateTable.data);
             console.log("refreshed users", updateTable.data);
+            setNotificationType("success");
+            setNotification(`Successfully deleted ${name}`)
         } catch (error) {
             console.log("error", error);
-            setErrorMsg(`${name} was already removed from the server`);
+            setNotificationType("error")
+            setNotification(`${name} was already removed from the server. Please refresh the page.`);
             setTimeout(() => {
-                setErrorMsg("");
+                setNotification("");
             }, 7500);
         }
     }

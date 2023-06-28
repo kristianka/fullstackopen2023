@@ -9,16 +9,15 @@ import Numbers from './components/Numbers';
 import Notification from "./components/Notification"
 
 
-const App = (props) => {
+const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [personToSearch, setPersonToSearch] = useState("");
   const [notification, setNotification] = useState("");
+  const [notificationType, setNotificationType] = useState("");
 
   useEffect(() => {
-    console.log("in effect");
-
     personsService.getAll()
       .then(res => {
         setPersons(res.data)
@@ -33,12 +32,15 @@ const App = (props) => {
       name: newName,
       number: newNumber
     }
+
     try {
+      // make sure persons is up to date
       personsService.getAll()
         .then(res => {
           setPersons(res.data)
         });
 
+      // check if person already exists
       if (persons.some(p => p.name === newName)) {
         if (!window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
           return;
@@ -47,7 +49,6 @@ const App = (props) => {
         console.log("replacing", personToUpdate)
 
         // If user accepts, then overwrite the person
-        console.log(personToUpdate.id)
         personsService
           .update(personToUpdate.id, personObject)
           .then(res => {
@@ -55,25 +56,32 @@ const App = (props) => {
             const updatedPersons = persons.map(p => p.id === personToUpdate.id ? res.data : p);
             console.log(updatedPersons);
             setPersons(updatedPersons);
+            setNotificationType("success");
+            setNotification(`Successfully updated ${personObject.name}`);
           })
 
       }
+      // if person doesn't already exist, just create one
       else {
         personsService
           .create(personObject)
           .then(res => {
             setPersons(persons.concat(res.data));
+            setNotificationType("success");
+            setNotification(`Successfully added ${personObject.name}`);
             console.log(res);
           })
       }
     }
     catch {
       console.log("error", error);
+      setNotificationType("error");
       setNotification(`Error`);
-      setTimeout(() => {
-        setNotification("");
-      }, 7500);
     }
+    // reset notification and fields
+    setTimeout(() => {
+      setNotification("");
+    }, 7500);
     setNewName("");
     setNewNumber("");
   }
@@ -88,7 +96,7 @@ const App = (props) => {
 
       <div>
         <h2>Add a new user</h2>
-        <Notification msg={notification} />
+        <Notification msg={notification} type={notificationType} />
         <PersonForm addPerson={addPerson} newName={newName} setNewName={setNewName}
           newNumber={newNumber} setNewNumber={setNewNumber} />
       </div>
@@ -96,7 +104,8 @@ const App = (props) => {
       <div>
         <h2>Numbers</h2>
 
-        <Numbers persons={persons} personToSearch={personToSearch} setPersons={setPersons} notification={notification} setNotification={setNotification} />
+        <Numbers persons={persons} personToSearch={personToSearch} setPersons={setPersons} notification={notification} setNotification={setNotification}
+          setNotificationType={setNotificationType} />
       </div>
     </>
   )

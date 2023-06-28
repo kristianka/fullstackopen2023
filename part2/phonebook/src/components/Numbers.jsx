@@ -5,7 +5,8 @@ const Numbers = (props) => {
         <div>
             {props.persons.map(p =>
                 p.name.toUpperCase().includes(props.personToSearch.toUpperCase()) &&
-                <Person key={p.id} id={p.id} name={p.name} number={p.number} setPersons={props.setPersons} setErrorMsg={props.setErrorMsg} />)
+                <Person key={p.id} id={p.id} name={p.name} number={p.number} setPersons={props.setPersons}
+                    setNotification={props.setNotification} setNotificationType={props.setNotificationType} />)
             }
         </div>
     )
