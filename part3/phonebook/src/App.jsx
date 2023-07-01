@@ -43,22 +43,19 @@ const App = () => {
 
       // check if person already exists
       if (persons.some(p => p.name === newName)) {
-        if (!window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
-          return;
+        if (window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
+          const personToUpdate = persons.find(p => p.name === newName);
+          // If user accepts, then overwrite the person
+          personsService
+            .update(personToUpdate.id, personObject)
+            .then(res => {
+              // creates a new array without old person
+              const updatedPersons = persons.map(p => p.id === personToUpdate.id ? res.data : p);
+              setPersons(updatedPersons);
+              setNotificationType("success");
+              setNotification(`Successfully updated ${personObject.name}`);
+            });
         }
-        const personToUpdate = persons.find(p => p.name === newName);
-
-        // If user accepts, then overwrite the person
-        personsService
-          .update(personToUpdate.id, personObject)
-          .then(res => {
-            // creates a new array without old person
-            const updatedPersons = persons.map(p => p.id === personToUpdate.id ? res.data : p);
-            setPersons(updatedPersons);
-            setNotificationType("success");
-            setNotification(`Successfully updated ${personObject.name}`);
-          });
-
       }
       // if person doesn't already exist, just create one
       else {
@@ -68,6 +65,11 @@ const App = () => {
             setPersons(persons.concat(res.data));
             setNotificationType("success");
             setNotification(`Successfully added ${personObject.name}`);
+          })
+          .catch(err => {
+            console.log(err.response.data)
+            setNotificationType("error");
+            setNotification(`An error has occured: ${err.response.data}`);
           });
       }
     }
