@@ -10,7 +10,6 @@ import PersonForm from "./components/PersonForm";
 import Numbers from "./components/Numbers";
 import Notification from "./components/Notification";
 
-
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
@@ -34,49 +33,51 @@ const App = () => {
       number: newNumber
     };
 
-    try {
-      // make sure persons is up to date
-      personsService.getAll()
-        .then(res => {
-          setPersons(res.data);
-        });
+    // make sure persons is up to date
+    personsService.getAll()
+      .then(res => {
+        setPersons(res.data);
+      })
+      .catch(err => {
+        setNotificationType("error");
+        setNotification(`An error has occured: ${err.response.data}`);
+      });
 
-      // check if person already exists
-      if (persons.some(p => p.name === newName)) {
-        if (window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
-          const personToUpdate = persons.find(p => p.name === newName);
-          // If user accepts, then overwrite the person
-          personsService
-            .update(personToUpdate.id, personObject)
-            .then(res => {
-              // creates a new array without old person
-              const updatedPersons = persons.map(p => p.id === personToUpdate.id ? res.data : p);
-              setPersons(updatedPersons);
-              setNotificationType("success");
-              setNotification(`Successfully updated ${personObject.name}`);
-            });
-        }
-      }
-      // if person doesn't already exist, just create one
-      else {
+    // check if person already exists
+    if (persons.some(p => p.name === newName)) {
+      if (window.confirm(`${newName} is already added to the phonebook. Replace the old number with a new one?`)) {
+        const personToUpdate = persons.find(p => p.name === newName);
+        // If user accepts, then overwrite the person
         personsService
-          .create(personObject)
+          .update(personToUpdate.id, personObject)
           .then(res => {
-            setPersons(persons.concat(res.data));
+            // creates a new array without old person
+            const updatedPersons = persons.map(p => p.id === personToUpdate.id ? res.data : p);
+            setPersons(updatedPersons);
             setNotificationType("success");
-            setNotification(`Successfully added ${personObject.name}`);
+            setNotification(`Successfully updated ${personObject.name}`);
           })
           .catch(err => {
-            console.log(err.response.data)
             setNotificationType("error");
             setNotification(`An error has occured: ${err.response.data}`);
           });
       }
     }
-    catch (error) {
-      setNotificationType("error");
-      setNotification(`An error has occured: ${error.message}`);
+    // if person doesn't already exist, just create one
+    else {
+      personsService
+        .create(personObject)
+        .then(res => {
+          setPersons(persons.concat(res.data));
+          setNotificationType("success");
+          setNotification(`Successfully added ${personObject.name}`);
+        })
+        .catch(err => {
+          setNotificationType("error");
+          setNotification(`An error has occured: ${err.response.data}`);
+        });
     }
+
     // reset notification and fields
     setTimeout(() => {
       setNotification("");
