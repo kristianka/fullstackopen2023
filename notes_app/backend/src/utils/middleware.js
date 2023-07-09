@@ -3,7 +3,9 @@ const unknownEndpoint = (req, res) => {
 };
 
 const errorHandler = (error, req, res, next) => {
-    console.error(error.message);
+    if (process.env.NODE_ENV !== "test") {
+        console.error(error.message);
+    }
     if (error.name === "CastError") {
         return res.status(400).send("Incorrect formatting");
     } else if (error.name === "MongoConnectionException") {
@@ -17,6 +19,7 @@ const errorHandler = (error, req, res, next) => {
     } else {
         next(error);
     }
+
 };
 
 export { unknownEndpoint, errorHandler }
