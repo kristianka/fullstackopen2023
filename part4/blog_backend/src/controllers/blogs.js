@@ -1,5 +1,8 @@
 import Express from "express";
+import jwt from "jsonwebtoken";
 import { Blog } from "../models/blog.js"
+import { User } from "../models/user.js"
+import { getUserFromReq } from "../utils/middleware.js";
 const blogRouter = Express.Router();
 
 // Note that express-async-error library handles
@@ -7,30 +10,55 @@ const blogRouter = Express.Router();
 
 // Get blogs
 blogRouter.get("/", async (req, res) => {
-    const blogs = await Blog.find({});
+    const blogs = await Blog
+        .find({})
+        .populate("user", { username: 1, name: 1 });
     res.json(blogs)
 });
 
 // Add blogs
-blogRouter.post("/", async (req, res) => {
-    let blog = new Blog(req.body);
+blogRouter.post("/", getUserFromReq, async (req, res) => {
+    const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: "Invalid token" });
+    }
+    const user = await User.findById(decodedToken.id);
+
+    const blog = new Blog({
+        author: req.body.author,
+        title: req.body.title,
+        url: req.body.url,
+        likes: req.body.likes === undefined ? 0 : req.body.likes,
+        user: user._id
+    })
+
     if (!blog.title || !blog.url) {
-        return res.status(400).send("Missing title or url");
+        return res.status(400).json({ error: "Missing title or url" });
     }
-    if (isNaN(blog.likes)) {
-        blog.likes = 0;
-    }
-    const savedNote = await blog.save();
-    res.status(201).json(savedNote);
+
+    const savedBlog = await blog.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
+    res.status(201).json(savedBlog);
 });
 
-blogRouter.delete("/:id", async (req, res) => {
-    const id = req.params.id;
-    const blog = await Blog.findByIdAndDelete(id);
+blogRouter.delete("/:id", getUserFromReq, async (req, res) => {
+    if (!req.user.id) {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+    const blog = await Blog.findById(req.params.id);
+    console.log(blog.user)
+    console.log(req.user);
+    if (blog?.user.toString() != req.user.id.toString()) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    // check if blog exists if the user is authorized
     if (blog) {
-        res.status(204).end();
+        // delete the blog
+        await Blog.findByIdAndDelete(req.params.id);
+        res.status(200).json({ msg: "Successfully deleted" });
     } else {
-        res.status(404).send("Not found");
+        res.status(404).json({ error: "Not found" });
     }
 });
 
@@ -48,4 +76,4 @@ blogRouter.put("/:id", async (req, res, next) => {
 });
 
 
-export { blogRouter };
+export default blogRouter;
