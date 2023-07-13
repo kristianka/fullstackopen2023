@@ -1,4 +1,3 @@
-// commented out to avoid interference with other test files
 
 import { dummy, totalLikes, favouriteBlog, mostBlogs, mostLikes } from "../src/utils/list_helper"
 

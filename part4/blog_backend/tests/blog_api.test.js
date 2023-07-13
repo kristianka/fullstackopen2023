@@ -150,8 +150,6 @@ describe("when there is initially one user at db", () => {
             expect(blogsAtEnd).toEqual(blogsAtStart);
         })
 
-
-
         test("returns 400 if missing title", async () => {
             const blogsAtStart = await blogsInDb();
             const newBlog = {
