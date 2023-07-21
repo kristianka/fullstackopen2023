@@ -1,6 +1,9 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 
-const BlogForm = ({ addBlog, newBlog, setNewBlog }) => {
+const BlogForm = ({ createBlog }) => {
+    const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
+
     const handleTitleChange = (event) => {
         setNewBlog({ ...newBlog, title: event.target.value })
     }
@@ -11,23 +14,34 @@ const BlogForm = ({ addBlog, newBlog, setNewBlog }) => {
         setNewBlog({ ...newBlog, url: event.target.value })
     }
 
+    const addBlog = (event) => {
+        event.preventDefault();
+        const newBlogCopy = newBlog;
+        createBlog(newBlogCopy)
+        setNewBlog({ author: "", title: "", url: "" });
+    };
+
+
     return (
-        <div>
+        <div className="formDiv">
             <form onSubmit={addBlog}>
                 <div>
                     <label htmlFor="title">Title</label>
-                    <input name="title" type="text" value={newBlog.title} onChange={handleTitleChange} />
+                    <input id="titleInput" role="titleInput" name="title" type="text"
+                        value={newBlog.title} onChange={handleTitleChange} />
                 </div>
                 <div>
-                    <label htmlFor="author">Author</label>
-                    <input name="author" type="text" value={newBlog.author} onChange={handleAuthorChange} />
+                    <label aria-label="author" htmlFor="author">Author</label>
+                    <input id="authorInput" role="authorInput" name="author" type="text"
+                        value={newBlog.author} onChange={handleAuthorChange} />
                 </div>
                 <div>
-                    <label htmlFor="url">Link</label>
-                    <input name="url" type="text" value={newBlog.url} onChange={handleUrlChange} />
+                    <label aria-label="url" htmlFor="url">Link</label>
+                    <input id="urlInput" role="urlInput" name="url" type="text"
+                        value={newBlog.url} onChange={handleUrlChange} />
                 </div>
                 <div>
-                    <button type="submit">Add</button>
+                    <button id="submitNewBlog" type="submit">Add</button>
                 </div>
             </form>
         </div>

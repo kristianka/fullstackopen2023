@@ -1,20 +1,43 @@
-/* eslint-env node */
-
+// eslint-disable-next-line no-undef
 module.exports = {
-  env: { browser: true, es2020: true },
-  extends: [
-    'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react/jsx-runtime',
-    'plugin:react-hooks/recommended',
-  ],
-  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
-  settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
-  rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
-    ],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "cypress/globals": true
   },
-}
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:react/jsx-runtime"],
+  "overrides": [
+    {
+      "files": [
+        ".eslintrc.{js,cjs}"
+      ],
+    }
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react", "cypress"
+  ],
+  "rules": {
+    "quotes": [
+      "warn",
+      "double"
+    ],
+    "semi": [
+      "warn",
+      "always"
+    ],
+    "eqeqeq": "error",
+    "no-trailing-spaces": "error",
+    "object-curly-spacing": [
+      "error", "always"
+    ],
+    "arrow-spacing": [
+      "error", { "before": true, "after": true }
+    ],
+    "no-console": 1,
+    "react/react-in-jsx-scope": "off"
+  }
+};
