@@ -4,20 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "test": "vitest",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "cypress:open": "cypress open",
-    "cy:open-e2e": "cypress open --e2e --browser chrome",
-    "cy:open-unit": "cypress open --component --browser chrome",
-    "cy:run-e2e": "cypress run --e2e",
-    "cy:run-unit": "cypress run --component",
-    "cy:e2e": "start-server-and-test start http-get://localhost:8080 cy:open-e2e"
+    "cy:open-e2e": "cypress open --e2e --browser chrome"
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "cypress": "^12.17.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

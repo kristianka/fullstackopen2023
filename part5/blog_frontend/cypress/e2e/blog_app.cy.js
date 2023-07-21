@@ -18,7 +18,7 @@ describe("Blog app", function () {
         cy.get("html").should("not.contain", "Logged in as");
     });
 
-    it("login fails with wrong password", function () {
+    it("login fails with wrong credentials", function () {
         cy.get("#loginUsername").type("kristian");
         cy.get("#loginPassword").type("kristian");
         cy.contains("login").click();
@@ -27,7 +27,7 @@ describe("Blog app", function () {
         cy.get("html").should("not.contain", "Kristian logged in");
     });
 
-    it("user can login", function () {
+    it("login succeeds with right credentials", function () {
         cy.get("#loginUsername").type("kristian");
         cy.get("#loginPassword").type("kr15t1@n");
         cy.contains("login").click();
@@ -108,7 +108,6 @@ describe("Blog app", function () {
                     { title: "Test title 2 likes", likes: 2 },
                     { title: "Test title 3 likes", likes: 3 }
                 ];
-                // loop through the array and create a blog for each item
                 blogs.forEach(blog => {
                     cy.contains("Create a blog").click();
                     cy.get("#titleInput").type(blog.title);
@@ -116,7 +115,7 @@ describe("Blog app", function () {
                     cy.get("#urlInput").type("test.com");
                     cy.get("#submitNewBlog").click();
                     cy.contains("Show more").click();
-                    // click the like button as many times as the blog.likes value
+
                     for (let i = 0; i < blog.likes; i++) {
                         cy.get(".likeButton").eq(blogs.indexOf(blog)).click();
                     }
