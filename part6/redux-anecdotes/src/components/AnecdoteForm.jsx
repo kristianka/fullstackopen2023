@@ -4,11 +4,11 @@ import { createAnecdote } from '../reducers/anecdoteReducer'
 const NewNote = () => {
     const dispatch = useDispatch()
 
-    const addAnecdote = (event) => {
-        event.preventDefault()
-        const content = event.target.anecdote.value
-        event.target.anecdote.value = ""
-        dispatch(createAnecdote(content))
+    const addAnecdote = async (event) => {
+        event.preventDefault();
+        const content = event.target.anecdote.value;
+        event.target.anecdote.value = "";
+        dispatch(createAnecdote(content));
     }
 
     return (

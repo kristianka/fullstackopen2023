@@ -1,16 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from 'react-redux'
-import { likeAnecdote } from '../reducers/anecdoteReducer'
-import { setNotification, clearNotification } from '../reducers/notificationReducer'
+import { updateAnecdote } from '../reducers/anecdoteReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
 const Anecdote = ({ anecdote }) => {
     const dispatch = useDispatch()
-    const voteAnecdote = () => {
-        dispatch(likeAnecdote(anecdote))
-        dispatch(setNotification(`Voted "${anecdote.content}"`));
-        setTimeout(() => {
-            dispatch(clearNotification());
-        }, 5000);
+    const voteAnecdote = (event) => {
+        event.preventDefault();
+        dispatch(updateAnecdote(anecdote));
+        dispatch(setNotification({ title: `Voted "${anecdote.content}"`, seconds: 10 }));
     }
     return (
         <li>
