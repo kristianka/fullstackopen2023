@@ -1,11 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { createContext, useReducer, useContext } from "react";
+import { createContext, useReducer, useContext, useEffect } from "react";
 
 const notificationReducer = (state, action) => {
     switch (action.type) {
-        case "SET_TITLE":
-            return state = action.title
+        case "SET_MESSAGE":
+            return { ...state, message: action.message };
+        case "RESET_MESSAGE":
+            return { ...state, message: "" };
         default:
             return state;
     }
@@ -14,13 +16,24 @@ const notificationReducer = (state, action) => {
 const NotificationContext = createContext();
 
 export const NotificationContextProvider = (props) => {
-    const [notification, notificationDispatch] = useReducer(notificationReducer, "")
+    const [notification, notificationDispatch] = useReducer(notificationReducer, {
+        message: ""
+    });
+
+    // reset message after five seconds
+    useEffect(() => {
+        if (notification.message !== "") {
+            setTimeout(() => {
+                notificationDispatch({ type: "RESET_MESSAGE" });
+            }, 5000);
+        }
+    }, [notification.message]);
 
     return (
-        <NotificationContext.Provider value={[notification, notificationDispatch]}>
+        <NotificationContext.Provider value={{ notification, notificationDispatch }}>
             {props.children}
         </NotificationContext.Provider>
-    )
+    );
 }
 
 export const useNotificationValue = () => {
