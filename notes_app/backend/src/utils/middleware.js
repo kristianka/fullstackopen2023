@@ -1,3 +1,27 @@
+import jwt from "jsonwebtoken";
+
+const getTokenFromReq = (req, res, next) => {
+    const authorization = req.get("authorization");
+    if (authorization && authorization.startsWith("Bearer ")) {
+        req.token = authorization.replace("Bearer ", "");
+    } else {
+        req.token = null;
+    }
+    next();
+}
+
+const getUserFromReq = (req, res, next) => {
+    console.log(req.token);
+    const decodedToken = jwt.verify(req.token, process.env.SECRET);
+    if (decodedToken.id) {
+        req.user = decodedToken;
+    } else {
+        req.user = null;
+    }
+    next();
+}
+
+
 const unknownEndpoint = (req, res) => {
     res.status(404).send("Not found");
 };
@@ -27,4 +51,4 @@ const errorHandler = (error, req, res, next) => {
 
 };
 
-export { unknownEndpoint, errorHandler }
+export { getTokenFromReq, getUserFromReq, unknownEndpoint, errorHandler }

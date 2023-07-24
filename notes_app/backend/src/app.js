@@ -7,7 +7,8 @@ import dotenv from "dotenv"
 import notesRouter from "./controllers/notes.js";
 import usersRouter from "./controllers/users.js"
 import loginRouter from "./controllers/login.js";
-import { unknownEndpoint, errorHandler } from "./utils/middleware.js";
+import testingRouter from "./controllers/testingRouter.js";
+import { getTokenFromReq, unknownEndpoint, errorHandler } from "./utils/middleware.js";
 const app = express();
 dotenv.config();
 
@@ -26,14 +27,20 @@ morgan.token("body", req => {
     return JSON.stringify(req.body);
 });
 
-app.use(express.json());
 if (process.env.NODE_ENV !== "test") app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
+app.use(express.json());
 app.use(cors());
 app.use(express.static("build"));
+
+app.use(getTokenFromReq);
 
 app.use("/api/login", loginRouter);
 app.use("/api/notes", notesRouter);
 app.use("/api/users", usersRouter);
+
+if (process.env.NODE_ENV === "test") {
+    app.use("/api/testing", testingRouter);
+}
 app.use(unknownEndpoint);
 app.use(errorHandler);
 

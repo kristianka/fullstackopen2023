@@ -2,9 +2,10 @@
 module.exports = {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "cypress/globals": true
     },
-    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:react/jsx-runtime"],
     "overrides": [
         {
             "files": [
@@ -16,6 +17,9 @@ module.exports = {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "plugins": [
+        "react", "cypress"
+    ],
     "rules": {
         "quotes": [
             "warn",
@@ -33,6 +37,7 @@ module.exports = {
         "arrow-spacing": [
             "error", { "before": true, "after": true }
         ],
-        "no-console": 1
+        "no-console": 1,
+        "react/react-in-jsx-scope": "off"
     }
 };

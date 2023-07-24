@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 const noteRouter = express.Router();
 import { Note } from "../models/note.js";
 import { User } from "../models/user.js";
+import { getUserFromReq } from "../utils/middleware.js";
 
 const getTokenFrom = (req) => {
     const authorization = req.get("authorization");
@@ -73,15 +74,22 @@ noteRouter.put("/:id", async (req, res, next) => {
     res.status(200).json(updatedNote);
 });
 
-noteRouter.delete("/:id", async (req, res, next) => {
-    const id = req.params.id;
-    const note = await Note.findByIdAndDelete(id);
+noteRouter.delete("/:id", getUserFromReq, async (req, res, next) => {
+    if (!req.user.id) {
+        return res.status(401).json({ error: "Invalid token" });
+    }
+    const note = await Note.findById(req.params.id);
+
+    if (note?.user.toString() != req.user.id.toString()) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    // check if note exists if the user is authorized
     if (note) {
-        console.log(`Deleted ${note.content}`);
-        res.status(204).end();
+        // delete the note
+        await Note.findByIdAndDelete(req.params.id);
+        res.status(200).json({ msg: "Successfully deleted" });
     } else {
-        console.log(`No matches found with the id ${id}`);
-        res.status(404).send("Not found");
+        res.status(404).json({ error: "Not found" });
     }
 });
 

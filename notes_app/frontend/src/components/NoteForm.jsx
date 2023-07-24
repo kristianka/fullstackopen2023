@@ -1,22 +1,34 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import { useState } from "react";
 
+const NoteForm = ({ createNote }) => {
+    const [newNote, setNewNote] = useState("");
+    const [newImportant, setNewImportant] = useState(false);
 
-const NoteForm = ({ addNote, newNote, setNewNote, newImportant, setNewImportant }) => {
+    const addNote = (event) => {
+        event.preventDefault();
+        const noteObj = {
+            content: newNote,
+            important: newImportant
+        };
+        createNote({ noteObj });
+        setNewNote("");
+    };
+
     return (
         <div>
             <form onSubmit={addNote}>
                 <div>
                     <label htmlFor="name">Text </label>
-                    <input name="name" type="text" value={newNote} onChange={(event) => setNewNote(event.target.value)} />
+                    <input id="newNoteName" name="name" type="text" value={newNote} onChange={(event) => setNewNote(event.target.value)} />
                 </div>
                 <div>
                     <label htmlFor="important">Priority </label>
-                    <select name="important" value={newImportant} onChange={(event) => setNewImportant(event.target.value)}>
+                    <select id="newNoteImportance" name="important" value={newImportant} onChange={(event) => setNewImportant(event.target.value)}>
                         <option value={true}>High</option>
                         <option value={false}>Low</option>
                     </select>
-                    <button type="submit">Add</button>
+                    <button id="submitNewNote" type="submit">Add</button>
                 </div>
 
             </form>
