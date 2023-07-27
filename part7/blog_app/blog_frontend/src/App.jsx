@@ -4,36 +4,58 @@ import "./index.css";
 
 import blogsService from "./services/blogs";
 import loginService from "./services/login";
+import usersService from "./services/users";
 import Notification from "./components/Notification";
 import BlogForm from "./components/BlogForm";
-import Blog from "./components/Blog";
 import Togglable from "./components/Togglable";
+import Users from "./components/Users";
+import Blogs from "./components/Blogs";
+import UserView from "./components/UserView";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer";
+import { setBlogs, addBlog, likeBlog, deleteBlog } from "./reducers/blogReducer";
+import { setUser } from "./reducers/userReducer";
+import { Routes, Route, useMatch } from "react-router-dom";
+import { setUsers } from "./reducers/usersReducer";
+
+
 
 const App = () => {
-    const [blogs, setBlogs] = useState([]);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [user, setUser] = useState(null);
-
     const dispatch = useDispatch();
     const blogFormRef = useRef();
 
+    const blogs = useSelector((state) => state.blogs);
+    const user = useSelector((state) => state.user);
+    const users = useSelector((state) => state.users);
+
+    // fetch all blogs and users
     useEffect(() => {
         blogsService.getAll()
             .then(res => {
-                setBlogs(res.data);
+                dispatch(setBlogs(res.data));
+            });
+        usersService.getAll()
+            .then(res => {
+                dispatch(setUsers(res.data));
             });
     }, []);
 
+    const match = useMatch("/users/:id");
+    const matchedUser = match ? users.find(a => a.id === match.params.id) : null;
+
+    useEffect(() => {
+        console.log("Redux Store Blogs State:", blogs);
+        console.log("Redux Store Users State:", users);
+    }, [blogs, users]);
 
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON);
-            setUser(user);
+            dispatch(setUser(user));
             blogsService.setToken(user.token);
         }
     }, []);
@@ -42,7 +64,7 @@ const App = () => {
         event.preventDefault();
         try {
             window.localStorage.removeItem("loggedBlogAppUser");
-            setUser(null);
+            dispatch(setUser(null));
             dispatch(setNotification({ title: "Logged out", type: "success", seconds: 5 }));
 
         } catch (err) {
@@ -59,10 +81,10 @@ const App = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            const user = await loginService.login({ username, password, });
+            const user = await loginService.login({ username, password });
             window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
             blogsService.setToken(user.token);
-            setUser(user);
+            dispatch(setUser(user));
             setUsername("");
             setPassword("");
             dispatch(setNotification({ title: `Welcome back ${user.name}! 👋`, type: "success", seconds: 5 }));
@@ -87,30 +109,28 @@ const App = () => {
         </form>
     );
 
-    const addBlog = (blogObj) => {
-        blogsService.create(blogObj)
-            .then(res => {
-                setBlogs(blogs.concat(res.data));
-                dispatch(setNotification({
-                    title: `Successfully added ${blogObj.title} by ${blogObj.author}`, type: "success", seconds: 5
-                }));
-                blogFormRef.current.toggleVisibility();
-                blogsService.getAll()
-                    .then(res => {
-                        setBlogs(res.data);
-                    });
-            })
-            .catch(err => {
-                console.log(err);
-                dispatch(setNotification({
-                    title: "Error while adding a new blog. Please try again later!", type: "error", seconds: 5
-                }));
-            });
+    const addNewBlog = async (blogObj) => {
+        try {
+            const newBlog = await blogsService.create(blogObj);
+            // this so blog creator is shown locally before page refresh
+            newBlog.data.user = user;
+            dispatch(addBlog(newBlog.data));
+            dispatch(setNotification({
+                title: `Successfully added ${blogObj.title} by ${blogObj.author}`, type: "success", seconds: 5
+            }));
+            blogFormRef.current.toggleVisibility();
+        } catch (error) {
+            console.log(error);
+            dispatch(setNotification({
+                title: "Error while adding a new blog. Please try again later!", type: "error", seconds: 5
+            }));
+        }
     };
 
-    const likeBlog = async (blogObj) => {
+    const addLikeToBlog = async (blogObj) => {
         try {
             await blogsService.update(blogObj.id);
+            dispatch(likeBlog({ id: blogObj.id, likes: blogObj.likes + 1 }));
             dispatch(setNotification({
                 title: `Liked ${blogObj.title} by ${blogObj.author}`, type: "success", seconds: 5
             }));
@@ -124,8 +144,7 @@ const App = () => {
     const removeBlog = async (blogObj) => {
         try {
             await blogsService.remove(blogObj.id);
-            const updateTable = await blogsService.getAll();
-            setBlogs(updateTable.data);
+            dispatch(deleteBlog(blogObj.id));
             dispatch(setNotification({ title: `Successfully deleted ${blogObj.title}`, type: "success", seconds: 5 }));
         } catch (error) {
             dispatch(setNotification({
@@ -134,7 +153,7 @@ const App = () => {
         }
     };
 
-    const sortedBlogs = [].concat(blogs).sort((a, b) => b.likes - a.likes);
+    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
 
     if (user === null) {
         return (
@@ -157,21 +176,23 @@ const App = () => {
                 {user && logOutForm()}
                 {user && <div>
                     <p>{user.name} logged in</p>
-                    <div>
-                        <Togglable buttonLabel="Create a blog" ref={blogFormRef}>
-                            <BlogForm createBlog={addBlog} />
-                        </Togglable>
-                    </div>
                 </div>
                 }
             </div>
-            <div>
-                <h2>Blogs</h2>
-                {sortedBlogs.map(blog =>
-                    <Blog key={blog.id} blog={blog} likeBlog={likeBlog} removeBlog={removeBlog} user={user} />
-                )}
-            </div>
-        </div>
+            <Routes>
+                <Route path="/users" element={<Users />}></Route>
+                <Route path="/users/:id" element={<UserView user={matchedUser} />}></Route>
+                <Route path="/" element={
+                    <>
+                        <Togglable buttonLabel="Create a blog" ref={blogFormRef}>
+                            <BlogForm createBlog={addNewBlog} />
+                        </Togglable>
+                        <Blogs sortedBlogs={sortedBlogs}
+                            addLikeToBlog={addLikeToBlog} removeBlog={removeBlog} />
+                    </>}>
+                </Route>
+            </Routes>
+        </div >
     );
 };
 
