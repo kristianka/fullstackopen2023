@@ -11,10 +11,12 @@ import Togglable from "./components/Togglable";
 import Users from "./components/Users";
 import Blogs from "./components/Blogs";
 import UserView from "./components/UserView";
+import BlogView from "./components/BlogView";
+import NavigationMenu from "./components/NavigationMenu";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer";
-import { setBlogs, addBlog, likeBlog, deleteBlog } from "./reducers/blogReducer";
+import { setBlogs, addBlog, likeBlog, deleteBlog, addComment } from "./reducers/blogReducer";
 import { setUser } from "./reducers/userReducer";
 import { Routes, Route, useMatch } from "react-router-dom";
 import { setUsers } from "./reducers/usersReducer";
@@ -43,8 +45,11 @@ const App = () => {
             });
     }, []);
 
-    const match = useMatch("/users/:id");
-    const matchedUser = match ? users.find(a => a.id === match.params.id) : null;
+    const userMatch = useMatch("/users/:id");
+    const blogMatch = useMatch("/blogs/:id");
+    const matchedUser = userMatch ? users.find(a => a.id === userMatch.params.id) : null;
+    const matchedBlog = blogMatch ? blogs.find(b => b.id === blogMatch.params.id) : null;
+    console.log("matched blog", matchedBlog)
 
     useEffect(() => {
         console.log("Redux Store Blogs State:", blogs);
@@ -141,6 +146,20 @@ const App = () => {
         }
     };
 
+    const addCommentToBlog = async ({ id, comment }) => {
+        try {
+            const newComment = await blogsService.createComment(id, comment);
+            dispatch(addComment(newComment.data));
+            dispatch(setNotification({
+                title: `Added a new comment "${comment}"`, type: "success", seconds: 5
+            }));
+        } catch (error) {
+            dispatch(setNotification({
+                title: "Error while adding a comment. Please try again later!", type: "error", seconds: 5
+            }));
+        }
+    };
+
     const removeBlog = async (blogObj) => {
         try {
             await blogsService.remove(blogObj.id);
@@ -167,28 +186,26 @@ const App = () => {
 
     return (
         <div>
+            <NavigationMenu logOutForm={logOutForm} />
             <div>
                 <h1>Blogs</h1>
             </div>
             <div>
                 <h2>Add a new blog</h2>
                 <Notification />
-                {user && logOutForm()}
-                {user && <div>
-                    <p>{user.name} logged in</p>
-                </div>
-                }
             </div>
             <Routes>
                 <Route path="/users" element={<Users />}></Route>
                 <Route path="/users/:id" element={<UserView user={matchedUser} />}></Route>
+                <Route path="/blogs/:id" element={<BlogView blog={matchedBlog}
+                    likeBlog={addLikeToBlog} removeBlog={removeBlog} addComment={addCommentToBlog} />}></Route>
                 <Route path="/" element={
                     <>
                         <Togglable buttonLabel="Create a blog" ref={blogFormRef}>
                             <BlogForm createBlog={addNewBlog} />
                         </Togglable>
                         <Blogs sortedBlogs={sortedBlogs}
-                            addLikeToBlog={addLikeToBlog} removeBlog={removeBlog} />
+                            likeBlog={addLikeToBlog} removeBlog={removeBlog} />
                     </>}>
                 </Route>
             </Routes>

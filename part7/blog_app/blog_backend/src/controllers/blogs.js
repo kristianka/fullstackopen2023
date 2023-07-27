@@ -2,6 +2,7 @@ import Express from "express";
 import jwt from "jsonwebtoken";
 import { Blog } from "../models/blog.js"
 import { User } from "../models/user.js"
+import { Comment } from "../models/comment.js";
 import { getUserFromReq } from "../utils/middleware.js";
 const blogRouter = Express.Router();
 
@@ -12,7 +13,8 @@ const blogRouter = Express.Router();
 blogRouter.get("/", async (req, res) => {
     const blogs = await Blog
         .find({})
-        .populate("user", { username: 1, name: 1 });
+        .populate("user", { username: 1, name: 1 })
+        .populate("comments");
     res.json(blogs)
 });
 
@@ -89,5 +91,28 @@ blogRouter.put("/:id", getUserFromReq, async (req, res, next) => {
     }
 });
 
+// Comments
+blogRouter.post("/:id/comments", async (req, res) => {
+    console.log("posting comment")
+    const { id } = req.params;
+    const { content } = req.body;
+    if (!id || !content) {
+        return res.status(400).json({ error: "Missing blog id or comment body" });
+    }
+    const comment = new Comment({ content, blog: id });
+    await comment.save();
+
+    const blog = await Blog.findById(id);
+    blog.comments.push(comment);
+    await blog.save();
+    res.status(201).json(comment);
+});
+
+blogRouter.get("/:id/comments", async (req, res) => {
+    const { id } = req.params;
+    console.log("getting comments from id", id)
+    const comments = await Comment.find({ blog: id });
+    res.status(200).json(comments);
+})
 
 export default blogRouter;

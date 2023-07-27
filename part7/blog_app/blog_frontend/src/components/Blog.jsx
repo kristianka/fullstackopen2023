@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Blog = (props) => {
     const [view, setView] = useState(false);
@@ -31,23 +32,26 @@ const Blog = (props) => {
     };
 
     return (
-        <div style={blogStyle} className="blog" >
-            <p>{props.blog.title} by {props.blog.author}</p>
-            <button onClick={changeView}>{view ? "Hide" : "Show more"}</button>
-            {view ? (
-                <ul className="allInfo">
-                    <li>Link: <a href={props.blog.url} rel="noreferrer">{props.blog.url}</a></li>
-                    <li>Link: {props.blog.url}</li>
-                    <li>Likes: {props.blog.likes} <button className="likeButton"
-                        data-testid="addLike" onClick={handleLike}>Like +1</button></li>
-                    <li>Added by: {props.blog.user.name}</li>
-                    {props.blog?.user?.name === user?.name && (
-                        <li>
-                            <button onClick={handleDelete}>Delete</button>
-                        </li>
-                    )}
-                </ul>
-            ) : null}
+        // <div style={blogStyle} className="blog" >
+        //     <p>{props.blog.title} by {props.blog.author}</p>
+        //     <button onClick={changeView}>{view ? "Hide" : "Show more"}</button>
+        //     {view ? (
+        //         <ul className="allInfo">
+        //             <li>Link: <a href={props.blog.url} rel="noreferrer">{props.blog.url}</a></li>
+        //             <li>Link: {props.blog.url}</li>
+        //             <li>Likes: {props.blog.likes} <button className="likeButton"
+        //                 data-testid="addLike" onClick={handleLike}>Like +1</button></li>
+        //             <li>Added by: {props.blog.user.name}</li>
+        //             {props.blog?.user?.name === user?.name && (
+        //                 <li>
+        //                     <button onClick={handleDelete}>Delete</button>
+        //                 </li>
+        //             )}
+        //         </ul>
+        //     ) : null}
+        // </div>
+        <div>
+            <Link to={`/blogs/${props.blog.id}`}>{props.blog.title}</Link>
         </div>
     );
 };

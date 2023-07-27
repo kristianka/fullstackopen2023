@@ -24,9 +24,17 @@ const blogsSlice = createSlice({
             // delete the blog from reducer
             const id = action.payload;
             return state.filter((blog) => blog.id !== id);
+        },
+        addComment(state, action) {
+            console.log("action", action.payload);
+            const { blog } = action.payload;
+            const blogToUpdate = state.find(b => b.id === blog);
+            if (blogToUpdate) {
+                blogToUpdate.comments.push(action.payload);
+            }
         }
     }
 });
 
-export const { setBlogs, addBlog, likeBlog, deleteBlog } = blogsSlice.actions;
+export const { setBlogs, addBlog, likeBlog, deleteBlog, addComment } = blogsSlice.actions;
 export default blogsSlice.reducer;
