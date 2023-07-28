@@ -21,7 +21,7 @@ import { setUser } from "./reducers/userReducer";
 import { Routes, Route, useMatch } from "react-router-dom";
 import { setUsers } from "./reducers/usersReducer";
 
-
+import { Container, TextField, Button } from "@mui/material";
 
 const App = () => {
     const [username, setUsername] = useState("");
@@ -49,7 +49,7 @@ const App = () => {
     const blogMatch = useMatch("/blogs/:id");
     const matchedUser = userMatch ? users.find(a => a.id === userMatch.params.id) : null;
     const matchedBlog = blogMatch ? blogs.find(b => b.id === blogMatch.params.id) : null;
-    console.log("matched blog", matchedBlog)
+    console.log("matched blog", matchedBlog);
 
     useEffect(() => {
         console.log("Redux Store Blogs State:", blogs);
@@ -77,12 +77,6 @@ const App = () => {
         }
     };
 
-    const logOutForm = () => (
-        <form onSubmit={logOut}>
-            <button>Logout</button>
-        </form>
-    );
-
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
@@ -100,18 +94,10 @@ const App = () => {
 
     const loginForm = () => (
         <form onSubmit={handleLogin}>
-            <div>
-                username
-                <input id="loginUsername" type="text" value={username} name="Username"
-                    onChange={({ target }) => setUsername(target.value)} />
-            </div>
-            <div>
-                password
-                <input id="loginPassword" type="password" value={password} name="Password"
-                    onChange={({ target }) => setPassword(target.value)} />
-            </div>
-            <button type="submit">login</button>
-        </form>
+            <TextField label="username" value={username} onChange={(({ target }) => setUsername(target.value))}></TextField>
+            <TextField label="password" type="password" value={password} onChange={(({ target }) => setPassword(target.value))}>Password</TextField>
+            <Button type="submit">Login</Button>
+        </form >
     );
 
     const addNewBlog = async (blogObj) => {
@@ -185,31 +171,29 @@ const App = () => {
     }
 
     return (
-        <div>
-            <NavigationMenu logOutForm={logOutForm} />
+        <Container>
             <div>
-                <h1>Blogs</h1>
-            </div>
-            <div>
-                <h2>Add a new blog</h2>
+                <NavigationMenu logOut={logOut} />
                 <Notification />
-            </div>
-            <Routes>
-                <Route path="/users" element={<Users />}></Route>
-                <Route path="/users/:id" element={<UserView user={matchedUser} />}></Route>
-                <Route path="/blogs/:id" element={<BlogView blog={matchedBlog}
-                    likeBlog={addLikeToBlog} removeBlog={removeBlog} addComment={addCommentToBlog} />}></Route>
-                <Route path="/" element={
-                    <>
-                        <Togglable buttonLabel="Create a blog" ref={blogFormRef}>
-                            <BlogForm createBlog={addNewBlog} />
-                        </Togglable>
-                        <Blogs sortedBlogs={sortedBlogs}
-                            likeBlog={addLikeToBlog} removeBlog={removeBlog} />
-                    </>}>
-                </Route>
-            </Routes>
-        </div >
+                <Routes>
+                    <Route path="/users" element={<Users />}></Route>
+                    <Route path="/users/:id" element={<UserView user={matchedUser} />}></Route>
+                    <Route path="/blogs/:id" element={<BlogView blog={matchedBlog}
+                        likeBlog={addLikeToBlog} removeBlog={removeBlog} addComment={addCommentToBlog} />}></Route>
+                    <Route path="/" element={
+                        <>
+                            <h2>Blogs</h2>
+                            <h3>Add a new blog</h3>
+                            <Togglable buttonLabel="Create a blog" ref={blogFormRef}>
+                                <BlogForm createBlog={addNewBlog} />
+                            </Togglable>
+                            <Blogs sortedBlogs={sortedBlogs}
+                                likeBlog={addLikeToBlog} removeBlog={removeBlog} />
+                        </>}>
+                    </Route>
+                </Routes>
+            </div >
+        </Container>
     );
 };
 

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+
 const Blog = (props) => {
     const [view, setView] = useState(false);
     const user = useSelector((state) => state.user);
@@ -50,9 +51,9 @@ const Blog = (props) => {
         //         </ul>
         //     ) : null}
         // </div>
-        <div>
+        <>
             <Link to={`/blogs/${props.blog.id}`}>{props.blog.title}</Link>
-        </div>
+        </>
     );
 };
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { TableContainer, Paper, Table, TableBody, TableCell, TableHead, TableRow, Button, TextField } from "@mui/material";
 
 const BlogView = ({ blog, likeBlog, removeBlog, addComment }) => {
     const user = useSelector((state) => state.user);
@@ -36,30 +37,57 @@ const BlogView = ({ blog, likeBlog, removeBlog, addComment }) => {
     return (
 
         <div className="blog" >
-            <h3>{blog.title} by {blog.author}</h3>
-            <ul className="allInfo">
-                <li>Link: <a href={blog.url} rel="noreferrer">{blog.url}</a></li>
-                <li>Likes: {blog.likes} <button className="likeButton"
-                    data-testid="addLike" onClick={handleLike}>Like +1</button></li>
-                <li>Added by: {blog.user.name}</li>
+            <h2>Blog info</h2>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell>Author</TableCell>
+                            <TableCell>Link</TableCell>
+                            <TableCell>Likes</TableCell>
+                            <TableCell>Added by</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        <TableRow key={blog.id}>
+                            <TableCell>{blog.title}</TableCell>
+                            <TableCell>{blog.author}</TableCell>
+                            <TableCell>{blog.url}</TableCell>
+                            <TableCell>{blog.likes}</TableCell>
+                            <TableCell>{blog.user.name}</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <div>
+                <Button onClick={handleLike}>Like blog</Button>
                 {blog?.user?.name === user?.name && (
-                    <li>
-                        <button onClick={handleDelete}>Delete</button>
-                    </li>
+                    <Button onClick={handleDelete}>Delete blog</Button>
                 )}
-            </ul>
+            </div>
+
             <h3>Comments</h3>
             <form action="" onSubmit={handleCommentCreation}>
-                <input value={newComment} onChange={handleNewCommentChange} type="text" />
-                <button>Add comment</button>
+                <TextField value={newComment} onChange={handleNewCommentChange}></TextField>
+                <Button type="submit">Add comment</Button>
             </form>
-            <ul>
-                {blog && blog.comments.map(b => (
-                    <li key={b.id}>{b.content}</li>
-                ))}
-            </ul>
-        </div>
 
+            <TableContainer>
+                <Table>
+                    <TableBody>
+                        <TableCell>
+                            {blog && blog.comments.map(b => (
+                                <TableRow key={b.id}>
+                                    {b.content}
+                                </TableRow>
+                            ))}
+                        </TableCell>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
     );
 };
 

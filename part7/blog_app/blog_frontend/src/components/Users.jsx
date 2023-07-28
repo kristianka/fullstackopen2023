@@ -2,13 +2,11 @@
 import { Link } from "react-router-dom";
 import usersService from "../services/users";
 import { useEffect, useState } from "react";
+import { Paper, TableContainer, Table, TableBody, TableHead, TableRow, TableCell } from "@mui/material";
 
 const StatisticLine = ({ user }) => {
-    console.log("user", user);
     return (
-        <tr>
-            <td><Link to={`/users/${user.id}`}>{user.name}</Link></td><td>{user.blogs.length}</td>
-        </tr>
+        <Link to={`/users/${user.id}`}>{user.name}</Link>
     );
 };
 
@@ -19,25 +17,33 @@ const Users = () => {
             .getAll()
             .then(res => setUsers(res.data));
     }, []);
-    console.log("in users", users);
 
     return (
         <div>
             <h2>Users</h2>
             {!users && <p>No users added</p>}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Blogs created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users && users.map(u => (
-                        <StatisticLine key={u.id} user={u} />
-                    ))}
-                </tbody>
-            </table>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Added blogs</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users && users.map(u => (
+                            <TableRow key={u.id}>
+                                <TableCell>
+                                    <StatisticLine key={u.id} user={u} />
+                                </TableCell>
+                                <TableCell>
+                                    {u.blogs.length}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
     );
 };

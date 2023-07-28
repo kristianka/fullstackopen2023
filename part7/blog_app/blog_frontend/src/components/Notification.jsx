@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { clearNotification } from "../reducers/notificationReducer";
 import { useDispatch } from "react-redux";
+import { Alert } from "@mui/material";
 
 const Notification = () => {
     const { title, type, seconds } = useSelector((state) => state.notification);
@@ -28,9 +29,9 @@ const Notification = () => {
     }
 
     return (
-        <div style={style}>
+        <Alert severity={type}>
             {title}
-        </div>
+        </Alert>
     );
 };
 

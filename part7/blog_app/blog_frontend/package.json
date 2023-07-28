@@ -13,6 +13,11 @@
     "cy:open-e2e": "cypress open --e2e --browser chrome"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.5",
+    "@mui/icons-material": "^5.14.1",
+    "@mui/material": "^5.14.2",
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.4.0",
     "cypress": "^12.17.2",
