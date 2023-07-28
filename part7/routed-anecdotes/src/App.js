@@ -78,6 +78,9 @@ const CreateNew = (props) => {
       votes: 0
     })
     props.setNotification(`Created new anecdote ${content.value}`)
+    setTimeout(() => {
+      props.setNotification("");
+    }, 5000);
     navigate("/");
   }
 
