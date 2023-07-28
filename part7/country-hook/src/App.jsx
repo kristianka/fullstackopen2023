@@ -27,7 +27,8 @@ const useCountry = (name) => {
                 } else {
                     setCountry({ data: null, found: false });
                 }
-            });
+            })
+            .catch(setCountry({ data: null, found: false }));
     }, [name])
 
     return country;
@@ -38,6 +39,7 @@ const Country = ({ country }) => {
         return null
     }
     console.log("in country", country)
+
     if (!country.found) {
         return (
             <div>
