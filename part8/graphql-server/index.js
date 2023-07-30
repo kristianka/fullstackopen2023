@@ -104,7 +104,7 @@ const typeDefs = `
         published: Int!,
         author: String!,
         id: String!,
-        genres: [String!]!
+        genres: [String!]
     },
     type Author {
         name: String!,
@@ -117,7 +117,7 @@ const typeDefs = `
             title: String!,
             author: String!,
             published: Int,
-            genres: [String!]!
+            genres: [String!]
         ) : Book
         editAuthor(
             name: String!,
