@@ -28,7 +28,10 @@ const Authors = (props) => {
     const { loading, data } = useQuery(ALL_AUTHORS);
     const [name, setName] = useState("");
     const [born, setBorn] = useState(0);
-    const [updateAuthor] = useMutation(UPDATE_AUTHOR, { refetchQueries: [{ query: ALL_AUTHORS }] });
+    const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
+        context: { headers: { Authorization: `Bearer ${props?.user?.data?.login?.value}` } },
+        refetchQueries: [{ query: ALL_AUTHORS }]
+    });
 
     if (!props.show) {
         return null
@@ -36,14 +39,14 @@ const Authors = (props) => {
     if (loading) {
         return <p>Loading from GraphQL...</p>
     }
-    console.log(data)
+
     const authors = data.allAuthors;
     const submit = async (event) => {
         event.preventDefault()
         console.log('add book...')
         updateAuthor({ variables: { name, born: Number(born) } })
     }
-    console.log(name)
+
     return (
         <div>
             <h2>authors</h2>

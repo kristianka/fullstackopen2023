@@ -1,6 +1,6 @@
 import { useState } from 'react'
 /* eslint-disable react/prop-types */
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation } from '@apollo/client'
 
 const CREATE_BOOK = gql`
 mutation addBook($title: String!, $author: String!, $published: Int!, $genres: [String!]) {
@@ -11,10 +11,11 @@ mutation addBook($title: String!, $author: String!, $published: Int!, $genres: [
         genres: $genres
     ) {
         title,
-        author,
+        author {
+            name
+        },
         published,
         genres
-        
     }
 }
 `
@@ -25,8 +26,7 @@ const NewBook = (props) => {
     const [published, setPublished] = useState('')
     const [genre, setGenre] = useState('')
     const [genres, setGenres] = useState([])
-
-    const [createBook] = useMutation(CREATE_BOOK);
+    const [createBook] = useMutation(CREATE_BOOK, { context: { headers: { Authorization: `Bearer ${props?.user?.data?.login?.value}` } } });
     if (!props.show) {
         return null
     }
@@ -34,7 +34,7 @@ const NewBook = (props) => {
     const submit = async (event) => {
         event.preventDefault()
         console.log('add book...')
-        createBook({ variables: { title, author, published: Number(published), genre } })
+        createBook({ variables: { title, author, published: Number(published), genres } })
         setTitle('')
         setPublished('')
         setAuthor('')
@@ -46,7 +46,7 @@ const NewBook = (props) => {
         setGenres(genres.concat(genre))
         setGenre('')
     }
-
+    console.log("title", title)
     return (
         <div>
             <form onSubmit={submit}>
