@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { gql, useQuery } from "@apollo/client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
 
 // const ALL_BOOKS = gql`
 // query {
@@ -40,16 +41,22 @@ query {
 const Books = (props) => {
     // const { loading, data } = useQuery(ALL_BOOKS, { pollInterval: 10000 });
     const [selectedGenre, setSelectedGenre] = useState("ALL");
-    const { data: booksByGenre } = useQuery(BOOKS_BY_GENRE, { variables: { genre: selectedGenre } });
+    const { data: booksByGenre, refetch } = useQuery(BOOKS_BY_GENRE, { variables: { genre: selectedGenre } });
     const { data: bookGenres } = useQuery(BOOK_GENRES)
+
+    useEffect(() => {
+        refetch({ genre: selectedGenre });
+    }, [selectedGenre, refetch]);
 
     if (!props.show) {
         return null
     }
-
-    console.log(bookGenres.allGenres)
     const books = booksByGenre?.allBooksByGenre || [];
-    console.log("books", books)
+
+    const handleGenreChange = (event) => {
+        setSelectedGenre(event.target.value);
+    };
+
     return (
         <div>
             <h2>books</h2>
@@ -75,10 +82,10 @@ const Books = (props) => {
             <div>
                 {bookGenres && bookGenres.allGenres.map(b => {
                     return (
-                        <button key={b} value={b} onClick={(event) => setSelectedGenre(event.target.value)}>{b}</button>
+                        <button key={b} value={b} onClick={handleGenreChange}>{b}</button>
                     )
                 })}
-                <button key="all" value="ALL" onClick={(event) => setSelectedGenre(event.target.value)}>ALL</button>
+                <button key="all" value="ALL" onClick={handleGenreChange}>ALL</button>
             </div>
         </div >
     )
