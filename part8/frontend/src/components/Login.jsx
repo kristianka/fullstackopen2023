@@ -22,6 +22,7 @@ const Login = (props) => {
     const handleLogin = async (event) => {
         event.preventDefault()
         const token = await login({ variables: { username, password } });
+        localStorage.setItem('bookslist-user-token', token.data.login.value);
         props.setLoggedUser(token);
         setUsername("");
         setPassword("");

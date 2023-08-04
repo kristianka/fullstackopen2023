@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
-import { gql, useQuery } from "@apollo/client"
+import { gql, useQuery, useSubscription, useApolloClient } from "@apollo/client"
 import { useEffect, useState } from "react"
+import { updateCache } from "../App"
 
 
 // const ALL_BOOKS = gql`
@@ -37,6 +39,20 @@ query {
     allGenres
   }
 `
+const BOOK_SUB = gql`
+    subscription {
+    bookAdded {
+        title,
+        author {
+            name,
+            born,
+            bookCount,
+        },
+        published,
+        genres
+    }
+}       
+`
 
 const Books = (props) => {
     // const { loading, data } = useQuery(ALL_BOOKS, { pollInterval: 10000 });
@@ -48,11 +64,24 @@ const Books = (props) => {
         refetch({ genre: selectedGenre });
     }, [selectedGenre, refetch]);
 
+
+    const client = useApolloClient()
+
+    useSubscription(BOOK_SUB, {
+        onData: ({ data }) => {
+            const addedBook = data.data.bookAdded;
+            console.log(addedBook)
+            window.alert(`New book has been added! ${addedBook?.title} by ${addedBook?.author?.name} `)
+            updateCache(client.cache, { query: BOOKS_BY_GENRE, variables: { genre: selectedGenre } }, addedBook);
+        }
+    })
+
     if (!props.show) {
         return null
     }
-    const books = booksByGenre?.allBooksByGenre || [];
 
+    const books = booksByGenre?.allBooksByGenre || [];
+    console.log("books", books)
     const handleGenreChange = (event) => {
         setSelectedGenre(event.target.value);
     };

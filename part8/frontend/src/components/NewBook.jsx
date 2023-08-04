@@ -3,21 +3,16 @@ import { useState } from 'react'
 import { gql, useMutation } from '@apollo/client'
 
 const CREATE_BOOK = gql`
-mutation addBook($title: String!, $author: String!, $published: Int!, $genres: [String!]) {
-    addBook (
-        title: $title,
-        author: $author,
-        published: $published,
-        genres: $genres
-    ) {
-        title,
-        author {
-            name
-        },
-        published,
-        genres
+mutation($title: String!, $author: String!, $published: Int!, $genres: [String!]) {
+    addBook(title: $title, author: $author, published: $published, genres: $genres) {
+      title,
+      author {
+        name
+      },
+      published,
+      genres,
     }
-}
+  }
 `
 
 const NewBook = (props) => {
@@ -26,7 +21,12 @@ const NewBook = (props) => {
     const [published, setPublished] = useState('')
     const [genre, setGenre] = useState('')
     const [genres, setGenres] = useState([])
-    const [createBook] = useMutation(CREATE_BOOK, { context: { headers: { Authorization: `Bearer ${props?.user?.data?.login?.value}` } } });
+
+    const [createBook] = useMutation(CREATE_BOOK, {
+        onError: (error) => {
+            console.log(error);
+        },
+    });
     if (!props.show) {
         return null
     }
@@ -34,7 +34,13 @@ const NewBook = (props) => {
     const submit = async (event) => {
         event.preventDefault()
         console.log('add book...')
-        createBook({ variables: { title, author, published: Number(published), genres } })
+        const res = await createBook({
+            variables: { title, author, published: Number(published), genres },
+            context: {
+                headers: { Authorization: `Bearer ${props?.user?.data?.login?.value}` }
+            }
+        })
+        console.log("res", res)
         setTitle('')
         setPublished('')
         setAuthor('')
@@ -46,7 +52,6 @@ const NewBook = (props) => {
         setGenres(genres.concat(genre))
         setGenre('')
     }
-    console.log("title", title)
     return (
         <div>
             <form onSubmit={submit}>
