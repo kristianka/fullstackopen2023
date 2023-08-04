@@ -3,6 +3,7 @@ const Author = require("./schemas/Author");
 const User = require("./schemas/User");
 const { GraphQLError } = require("graphql");
 const jwt = require("jsonwebtoken")
+const mongoose = require("mongoose")
 
 const { PubSub } = require("graphql-subscriptions")
 const pubsub = new PubSub()
@@ -12,7 +13,18 @@ const resolvers = {
     Query: {
         bookCount: async () => await Book.countDocuments({}),
         authorCount: async () => await Author.countDocuments({}),
-        allBooks: async () => await Book.find({}).populate("author"),
+        allBooks: async (root, args, context) => {
+            if (args.genre) {
+                if (args.genre === "ALL") {
+                    const books = await Book.find({}).populate("author");
+                    return books
+                }
+                // case insensitive
+                const res = await Book.find({ genres: { $regex: new RegExp(args.genre, "i") } }).populate("author");
+                return res;
+            }
+            return await Book.find({}).populate("author")
+        },
         allBooksByGenre: async (root, args, context) => {
             const genre = args.genre;
             if (genre === "ALL") {
@@ -52,6 +64,7 @@ const resolvers = {
                 {
                     $project: {
                         name: 1,
+                        born: 1,
                         bookCount: { $size: "$books" },
                     },
                 },

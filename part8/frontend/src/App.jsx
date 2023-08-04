@@ -1,26 +1,10 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Authors from "./components/Authors"
 import Books from "./components/Books"
 import NewBook from "./components/NewBook"
 import Login from "./components/Login"
 import Recommendations from "./components/Recommendations"
-import { gql } from "@apollo/client"
-import { useQuery, useMutation, useSubscription, useApolloClient } from "@apollo/client"
 
-const SUB = gql`
-    subscription {
-        bookAdded {
-            title,
-            author {
-                name,
-                born,
-                bookCount,
-            },
-            published,
-            genres
-        }
-    }       
-`
 export const updateCache = (cache, query, addedBook) => {
     const { allBooksByGenre } = cache.readQuery(query);
     cache.writeQuery({
@@ -35,6 +19,19 @@ export const updateCache = (cache, query, addedBook) => {
 const App = () => {
     const [page, setPage] = useState("authors")
     const [loggedUser, setLoggedUser] = useState(null);
+
+    useEffect(() => {
+        const user = window.localStorage.getItem("bookslist-user-token");
+        if (user) {
+            setLoggedUser(user);
+        }
+    }, []);
+
+    const handleLogin = (token) => {
+        localStorage.setItem("bookslist-user-token", token.data.login.value);
+        console.log("logg", token.data.login.value)
+        setLoggedUser(token.data.login.value);
+    }
 
     const handleLogout = () => {
         localStorage.removeItem("bookslist-user-token");
@@ -54,7 +51,7 @@ const App = () => {
 
             <Authors show={page === "authors"} user={loggedUser} />
             <Books show={page === "books"} />
-            <Login show={page === "login"} user={loggedUser} setLoggedUser={setLoggedUser} />
+            <Login show={page === "login"} login={handleLogin} />
             <Recommendations show={page === "recommendations"} user={loggedUser}></Recommendations>
             <NewBook show={page === "add"} user={loggedUser} />
         </div>

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation } from '@apollo/client'
 
 const LOGIN = gql`
 mutation($username: String!, $password: String!) {
@@ -22,8 +22,7 @@ const Login = (props) => {
     const handleLogin = async (event) => {
         event.preventDefault()
         const token = await login({ variables: { username, password } });
-        localStorage.setItem('bookslist-user-token', token.data.login.value);
-        props.setLoggedUser(token);
+        props.login(token);
         setUsername("");
         setPassword("");
     }
