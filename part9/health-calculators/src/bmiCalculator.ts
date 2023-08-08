@@ -12,7 +12,7 @@ const calculateBmi = (height: number, weight: number): string => {
         message = "Obese (very unhealthy weight)";
     }
     return message;
-}
+};
 // console.log(calculateBmi(180, 49));
 // console.log(calculateBmi(180, 74));
 // console.log(calculateBmi(180, 85));
@@ -32,17 +32,17 @@ const parseArguments = (args: string[]): bmiInput => {
         return {
             height: Number(args[2]),
             weight: Number(args[3])
-        }
+        };
     } else {
         throw new Error("Provided values were not numbers!");
     }
-}
+};
 
 try {
     const { height, weight } = parseArguments(process.argv);
     console.log(`${height} cm and ${weight} kg is ` + calculateBmi(height, weight));
 } catch (error: unknown) {
-    let errorMessage = "Something bad happened."
+    let errorMessage = "Something bad happened.";
     if (error instanceof Error) {
         errorMessage += " Error: " + error.message;
     }

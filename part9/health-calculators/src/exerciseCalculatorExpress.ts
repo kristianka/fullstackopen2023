@@ -9,6 +9,11 @@ interface ExercisesResult {
     average: number
 }
 
+interface ExerciseInput {
+    daily_exercises: number[],
+    target: number
+}
+
 const calculateExercises = (exerciseHours: number[], target: number): ExercisesResult => {
     const totalHours = exerciseHours.reduce((a, b) => a + b, 0);
     const avgHours = totalHours / exerciseHours.length;
@@ -51,44 +56,27 @@ const calculateExercises = (exerciseHours: number[], target: number): ExercisesR
     return results;
 };
 
-// const dailyExerciseHours = [3, 0, 2, 4.5, 0, 3, 1];
-// const dailyExerciseHourGoal = 2;
-// console.log(calculateExercises(dailyExerciseHours, dailyExerciseHourGoal));
+const parseArguments = (days_exercised: unknown[], target: unknown): ExerciseInput => {
+    if (!days_exercised || !target) {
+        throw new Error("Missing arguments");
+    }
 
-interface ExerciseInput {
-    daysTarget: number,
-    exercisedHoursPerDay: number[]
-}
-
-const parseArguments = (args: string[]): ExerciseInput => {
-    if (args.length < 5) throw new Error("Not enough arguments");
+    if (typeof target !== "number") {
+        throw new Error("Malformatted Parameters");
+    }
 
     // remove unnecessary stuff, target and check that every input is a number
-    const userInput = args.slice(3);
-    userInput.forEach(element => {
+    days_exercised.forEach(element => {
         if (isNaN(Number(element))) {
             throw new Error("Every value must be a number!");
         }
     });
 
-    // remove target from array
-    const hours: number[] = userInput.map(Number);
-    console.log("hours", hours);
+    const hours: number[] = days_exercised.map(Number);
     return {
-        exercisedHoursPerDay: hours,
-        daysTarget: Number(args[2])
+        daily_exercises: hours,
+        target: Number(target)
     };
 };
 
-try {
-    const { exercisedHoursPerDay, daysTarget } = parseArguments(process.argv);
-    console.log(calculateExercises(exercisedHoursPerDay, daysTarget));
-} catch (error) {
-    let errorMessage = "Something bad happened.";
-    if (error instanceof Error) {
-        errorMessage += " Error: " + error.message;
-    }
-    console.log(errorMessage);
-}
-
-export { };
+export { calculateExercises, parseArguments as parseBodyArguments, ExerciseInput, ExercisesResult };
