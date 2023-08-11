@@ -25,7 +25,8 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry => {
             ssn: isString(object.ssn),
             dateOfBirth: isString(object.dateOfBirth),
             occupation: isString(object.occupation),
-            gender: parseGender(object.gender)
+            gender: parseGender(object.gender),
+            entries: []
         };
         return newEntry;
     }
