@@ -1,3 +1,4 @@
+import Part from "./Part";
 
 interface ContentProps {
     courseParts: {
@@ -11,13 +12,17 @@ const Content = (props: ContentProps) => {
     return (
         <div>
             <h2>Course content</h2>
-            <ul>
+            {props.courseParts.map(part => (
+                <Part key={part.name} part={part} />
+            ))}
+
+            {/* <ul>
                 {props.courseParts.map((part, index: number) => (
                     <li key={index}>
                         {part.name} - Exercises: {part.exerciseCount}
                     </li>
                 ))}
-            </ul>
+            </ul> */}
         </div>
     );
 }
