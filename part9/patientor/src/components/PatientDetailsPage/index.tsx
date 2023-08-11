@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom";
-import { Patient } from "../../types";
+import { Diagnosis, Patient } from "../../types";
 import patientsService from "../../services/patients";
 import { Divider } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
+import EntryDetails from "./EntryDetails";
 
-const PatientDetailsPage = () => {
+interface Props {
+    diagnoses: Diagnosis[];
+}
+
+const PatientDetailsPage = (props: Props) => {
     const { id } = useParams();
     const [patient, setPatient] = useState<Patient | undefined>();
-    console.log("id", id);
 
     useEffect(() => {
         if (id === undefined) return;
@@ -24,7 +28,6 @@ const PatientDetailsPage = () => {
     if (!patient) {
         return <div>Loading...</div>;
     }
-    console.log("patient", patient)
     return (
         <div>
             <h2>{patient.name}
@@ -36,6 +39,16 @@ const PatientDetailsPage = () => {
             <p>Gender: {patient.gender}</p>
             <p>SSN: {patient.ssn}</p>
             <p>Occupation: {patient.occupation}</p>
+
+            <h2>Entries</h2>
+            <Divider />
+            {patient.entries.map((entry) => (
+                <div style={{ border: "2px solid", margin: "5px", padding: "5px" }} key={entry.id}>
+                    <p><b>{entry.date}</b> {entry.description}</p>
+                    <p>Specialist: {entry.specialist}</p>
+                    <EntryDetails entry={entry} diagnoses={props.diagnoses} />
+                </div>
+            ))}
         </div>
     )
 }
