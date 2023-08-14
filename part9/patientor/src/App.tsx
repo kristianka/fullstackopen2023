@@ -7,6 +7,7 @@ import { apiBaseUrl } from "./constants";
 import { Patient, Diagnosis } from "./types";
 
 import patientService from "./services/patients";
+import diagnosisService from "./services/diagnoses";
 import PatientListPage from "./components/PatientListPage";
 import PatientDetailsPage from "./components/PatientDetailsPage";
 
@@ -23,7 +24,7 @@ const App = () => {
       setPatients(patients);
     };
     const fetchAllDiagnoses = async () => {
-      const diagnoses = await patientService.getAllDiagnoses();
+      const diagnoses = await diagnosisService.getAllDiagnoses();
       setDiagnoses(diagnoses);
     };
     void fetchPatientList();

@@ -7,6 +7,7 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import EntryDetails from "./EntryDetails";
+import DiagnosisForm from "./AddDiagnose/DiagnosisForm";
 
 interface Props {
     diagnoses: Diagnosis[];
@@ -40,6 +41,11 @@ const PatientDetailsPage = (props: Props) => {
             <p>SSN: {patient.ssn}</p>
             <p>Occupation: {patient.occupation}</p>
 
+            <h2>Add diagnose</h2>
+            <Divider />
+            <DiagnosisForm patient={patient} setPatient={setPatient} diagnoses={props.diagnoses} />
+
+
             <h2>Entries</h2>
             <Divider />
             {patient.entries.map((entry) => (
@@ -52,6 +58,5 @@ const PatientDetailsPage = (props: Props) => {
         </div>
     )
 }
-
 
 export default PatientDetailsPage;

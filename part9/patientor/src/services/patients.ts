@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Diagnosis, Patient, PatientFormValues } from "../types";
+import { Patient, PatientFormValues, Entry, EntryWithoutId } from "../types";
 
 import { apiBaseUrl } from "../constants";
 
@@ -18,11 +18,12 @@ const create = async (object: PatientFormValues) => {
   return data;
 };
 
-const getAllDiagnoses = async () => {
-  const { data } = await axios.get<Diagnosis[]>(`${apiBaseUrl}/diagnoses`);
+const createDiagnosis = async (id: string, diagnosis: EntryWithoutId) => {
+  const { data } = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, diagnosis);
   return data;
 }
 
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { getAll, getById, create, getAllDiagnoses };
+export default { getAll, getById, create, createDiagnosis };
 
