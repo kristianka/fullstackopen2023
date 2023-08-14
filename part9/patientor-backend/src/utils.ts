@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender } from "./types";
+import { NewPatientEntry, Gender, Diagnose } from "./types";
 
 const isString = (text: unknown): string => {
     if (typeof text !== 'string') {
@@ -34,3 +34,15 @@ const toNewPatientEntry = (object: unknown): NewPatientEntry => {
 };
 
 export default toNewPatientEntry;
+
+
+export const parseDiagnosisCodes = (object: unknown): Array<Diagnose['code']> => {
+    console.log("object", object);
+    if (!object || typeof object !== 'object' || !('diagnosisCodes' in object)) {
+        // we will just trust the data to be in correct form
+        console.log("returning empty array");
+        return [] as Array<Diagnose['code']>;
+    }
+    console.log("returning diagnosisCodes");
+    return object.diagnosisCodes as Array<Diagnose['code']>;
+};
