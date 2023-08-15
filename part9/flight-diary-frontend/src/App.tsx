@@ -1,6 +1,7 @@
 import { SyntheticEvent, useEffect, useState } from 'react'
 import diariesService from './services/diaries';
 import { DiaryEntry, Weather, Visibility, NewDiaryEntry } from './types';
+import { isAxiosError } from 'axios';
 
 function App() {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -37,7 +38,7 @@ function App() {
     const target = event.target as HTMLInputElement;
     setComment(target.value);
   };
-
+  console.log("notification", notification)
   const addDiaryEntry = async (event: SyntheticEvent) => {
     try {
       event.preventDefault();
@@ -52,17 +53,21 @@ function App() {
       setWeather("");
       setVisibility("");
       setComment("");
-      diaries.push({ ...res, comment: "" });
+      diaries.push({ ...res.data, comment: "" });
     } catch (error) {
-      console.log(error.response.data);
-      setNotification(error.response.data);
+      if (isAxiosError(error)) {
+        console.error("Error creating entry:", error);
+        setNotification(error?.response?.data);
+      } else {
+        console.error("Error creating entry:", error);
+        setNotification("An error occurred.");
+      }
       setTimeout(() => {
         setNotification("");
       }, 5000);
     }
   }
 
-  console.log(diaries);
   return (
     <div>
       <h1>Flight diaries</h1>

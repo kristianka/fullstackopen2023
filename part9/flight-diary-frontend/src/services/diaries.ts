@@ -9,10 +9,9 @@ const getAll = async () => {
 };
 
 const create = async (object: NewDiaryEntry) => {
-    const { data } = await axios.post<DiaryEntry>(
+    return await axios.post<DiaryEntry>(
         `${apiBaseUrl}/diaries`, object
     );
-    return data;
 };
 
 const pingServer = async () => {

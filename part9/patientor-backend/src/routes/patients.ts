@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import express from "express";
 import patientsService from "../services/patientsService";
 import toNewPatientEntry, { parseDiagnosisCodes } from "../utils";
