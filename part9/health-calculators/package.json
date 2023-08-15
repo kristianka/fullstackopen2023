@@ -27,7 +27,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-node": "ts-node",
     "calculateBmi": "ts-node src/bmiCalculator.ts",
-    "calculateExercise": "ts-node src/exerciseCalculator.ts",
+    "calculateExercises": "ts-node src/exerciseCalculator.ts",
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "lint": "eslint --ext .ts ."
