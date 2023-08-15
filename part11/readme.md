@@ -1,0 +1,1 @@
+Pokedex repository at https://github.com/kristianka/full-stack-open-pokedex
