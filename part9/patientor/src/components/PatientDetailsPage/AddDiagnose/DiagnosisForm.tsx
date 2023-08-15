@@ -3,11 +3,12 @@ import TextField from "@mui/material/TextField";
 import { Patient, Diagnosis } from "../../../types";
 import React from "react";
 import { format } from "date-fns"; // Import date-fns format function
-import { InputLabel, FormControl, Select, MenuItem, Button, OutlinedInput, SelectChangeEvent } from "@mui/material";
+import { InputLabel, FormControl, Select, MenuItem, Button, OutlinedInput, SelectChangeEvent, Alert } from "@mui/material";
 import Chooser from "./Chooser";
 import { Theme, useTheme } from '@mui/material/styles';
 import { EntryType, Entry } from "../../../types";
 import patientService from "../../../services/patients";
+import { AxiosResponse, isAxiosError } from "axios";
 
 interface DiagnosisFormProps {
     patient: Patient;
@@ -26,7 +27,6 @@ function getStyles(name: string, diagnoses: string[], theme: Theme) {
 
 const DiagnosisForm = (props: DiagnosisFormProps) => {
     const theme = useTheme();
-    console.log("patient", props.patient);
     const today = new Date();
     const formattedToday = format(today, "yyyy-MM-dd");
 
@@ -39,42 +39,55 @@ const DiagnosisForm = (props: DiagnosisFormProps) => {
     const [discharge, setDischarge] = useState({ date: "", criteria: "" });
     const [employerName, setEmployerName] = useState("");
     const [sickLeave, setSickLeave] = useState({ startDate: "", endDate: "" });
+    const [notification, setNotification] = useState<string | null>(null);
 
     const handleSubmit = async () => {
-        console.log("submitting");
-        let newEntry = {} as Entry;
-        switch (visitType) {
-            case EntryType.HealthCheck:
-                newEntry = await patientService.createDiagnosis(props.patient.id,
-                    { date, type: visitType, specialist, diagnosisCodes, description, healthCheckRating });
-                break;
-            case EntryType.Hospital:
-                newEntry = await patientService.createDiagnosis(props.patient.id,
-                    { date, type: visitType, specialist, diagnosisCodes, description, discharge, });
-                break;
-            case EntryType.OccupationalHealthcare:
-                newEntry = await patientService.createDiagnosis(props.patient.id,
-                    { date, type: visitType, specialist, diagnosisCodes, description, sickLeave, employerName });
-                break;
-            default:
-                break;
-        }
+        try {
+            let newEntry: AxiosResponse<Entry> | undefined = undefined;
+            switch (visitType) {
+                case EntryType.HealthCheck:
+                    newEntry = await patientService.createDiagnosis(props.patient.id,
+                        { date, type: visitType, specialist, diagnosisCodes, description, healthCheckRating });
+                    break;
+                case EntryType.Hospital:
+                    newEntry = await patientService.createDiagnosis(props.patient.id,
+                        { date, type: visitType, specialist, diagnosisCodes, description, discharge, });
+                    break;
+                case EntryType.OccupationalHealthcare:
+                    newEntry = await patientService.createDiagnosis(props.patient.id,
+                        { date, type: visitType, specialist, diagnosisCodes, description, sickLeave, employerName });
+                    break;
+                default:
+                    break;
+            }
 
-        const updatedPatient = {
-            ...props.patient,
-            entries: [...props.patient.entries, newEntry]
-        };
-        if (newEntry) {
-            props.setPatient(updatedPatient)
-            setDescription("");
-            setDate(formattedToday);
-            setSpecialist("");
-            setHealthCheckRating(0);
-            setVisitType(EntryType.HealthCheck);
-            setDiagnosisCodes([]);
-            setDischarge({ date: "", criteria: "" });
-            setEmployerName("");
-            setSickLeave({ startDate: "", endDate: "" });
+            if (newEntry && newEntry.data) {
+                const updatedPatient = {
+                    ...props.patient,
+                    entries: [...props.patient.entries, newEntry.data]
+                };
+                props.setPatient(updatedPatient)
+                setDescription("");
+                setDate(formattedToday);
+                setSpecialist("");
+                setHealthCheckRating(0);
+                setVisitType(EntryType.HealthCheck);
+                setDiagnosisCodes([]);
+                setDischarge({ date: "", criteria: "" });
+                setEmployerName("");
+                setSickLeave({ startDate: "", endDate: "" });
+            }
+        } catch (error: unknown) {
+            if (isAxiosError(error)) {
+                console.error("Error creating diagnosis:", error);
+                setNotification(error?.response?.data?.error);
+            } else {
+                console.error("Error creating diagnosis:", error);
+                setNotification("An error occurred.");
+            }
+            setTimeout(() => {
+                setNotification(null);
+            }, 5000);
         }
     };
     console.log(diagnosisCodes, "diagnosisCodes")
@@ -85,6 +98,7 @@ const DiagnosisForm = (props: DiagnosisFormProps) => {
 
     return (
         <div>
+            {notification && <Alert severity="error">{notification}</Alert>}
             <TextField margin="normal" multiline label="Description" variant="outlined" value={description}
                 onChange={({ target }) => setDescription(target.value)} fullWidth />
 
@@ -116,7 +130,10 @@ const DiagnosisForm = (props: DiagnosisFormProps) => {
                 </Select>
             </FormControl>
 
-            <Chooser entry={visitType} healthCheckRating={healthCheckRating} setHealthCheckRating={setHealthCheckRating} />
+            <Chooser entry={visitType}
+                healthCheckRating={healthCheckRating} setHealthCheckRating={setHealthCheckRating}
+                discharge={discharge} setDischarge={setDischarge}
+                employerName={employerName} setEmployerName={setEmployerName} sickLeave={sickLeave} setSickLeave={setSickLeave} />
             <Button variant="contained" onClick={handleSubmit}>Add diagnose</Button>
         </div>
     )

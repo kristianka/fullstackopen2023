@@ -30,7 +30,6 @@ const App = () => {
     void fetchPatientList();
     void fetchAllDiagnoses();
   }, []);
-  console.log("diagnoses", diagnoses)
   return (
     <div className="App">
       <Router>

@@ -19,8 +19,7 @@ const create = async (object: PatientFormValues) => {
 };
 
 const createDiagnosis = async (id: string, diagnosis: EntryWithoutId) => {
-  const { data } = await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, diagnosis);
-  return data;
+  return await axios.post<Entry>(`${apiBaseUrl}/patients/${id}/entries`, diagnosis);
 }
 
 
